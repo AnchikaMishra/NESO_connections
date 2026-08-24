@@ -1,0 +1,48 @@
+{
+   "action": {
+      "default_icon": {
+         "16": "assets/images/icon-inactive-16.png",
+         "24": "assets/images/icon-inactive-24.png",
+         "32": "assets/images/icon-inactive-32.png",
+         "48": "assets/images/icon-inactive-48.png"
+      },
+      "default_popup": "/popup/inactive-popup.html",
+      "default_title": "Nexthink"
+   },
+   "background": {
+      "service_worker": "background.js",
+      "type": "module"
+   },
+   "content_scripts": [ {
+      "js": [ "content/sharelinks-probe.js" ],
+      "matches": [ "https://nexthink.cloud/share/adopt/*", "https://*.nexthink.cloud/share/adopt/*" ],
+      "run_at": "document_start",
+      "world": "ISOLATED"
+   } ],
+   "content_security_policy": {
+      "extension_pages": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://*.nexthink.cloud https://*.nexthink.cloud:* https://*.nexthink.com https://*.nexthink.com:* wss://*.nexthink.cloud wss://*.nexthink.com;"
+   },
+   "description": "Extends Nexthink Infinity to add experience optimization for SaaS and other web applications",
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "128": "assets/images/icon-128.png",
+      "16": "assets/images/icon-active-16.png",
+      "24": "assets/images/icon-active-24.png",
+      "32": "assets/images/icon-active-32.png",
+      "48": "assets/images/icon-active-48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo2IXHZWswCuEGQotYDwLyFjSuO4b5H3uFtUQdQzhEwO2pCjz/UDDeSXVoNSlpsu8w9p5DdgYhfOLIztlPdv4l8U9Jy8+vI2zftWSGJD3U+soCA/Q3QZvL4pkpoUEiiz892RQdoczf6NG0H3NrVIkaeAKJ48bVHNU6Ukm8NX6S5GXAwrmIX1z/m1BU6hL9PdN62BHhOPA6LwzG3rVnqmq/cF0gcJIjxeW9HYJScineVbw0PchIqNd8xFVGHAJiN+Vw6m2Byfl1DtS9LcYvexNYIZs/+OCqwjJUxkbglj/3b6Hv1RQUhh4eyYtw6aAiOlnRe4SxN2rje3X5NUzQvNgswIDAQAB",
+   "manifest_version": 3,
+   "name": "Nexthink",
+   "optional_permissions": [ "downloads" ],
+   "permissions": [ "downloads", "idle", "nativeMessaging", "scripting", "storage", "tabs", "webNavigation", "webRequest", "contextMenus", "identity", "unlimitedStorage" ],
+   "short_name": "Nexthink Browser Extension",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "26.6.6",
+   "version_name": "26.6.6-release",
+   "web_accessible_resources": [ {
+      "extension_ids": [  ],
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "assets/*", "*.map", "content/assets/fonts/*" ]
+   } ]
+}

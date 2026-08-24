@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2004-2024 Nexthink
+This source code is being shared with Mozilla for security review only - all rights reserved
+-->
+
+<svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M23.6486 0.351492C23.1799 -0.117164 22.4202 -0.117164 21.9515 0.351492L7.57474 14.7284L2.04855 9.2022C1.57995 8.73354 0.820195 8.73359 0.351492 9.2022C-0.117164 9.67081 -0.117164 10.4306 0.351492 10.8992L6.72621 17.2738C7.19468 17.7424 7.95499 17.7421 8.42327 17.2738L23.6486 2.04855C24.1172 1.57995 24.1172 0.820149 23.6486 0.351492Z" fill="white"/>
+</svg>
