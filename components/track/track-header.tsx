@@ -115,23 +115,25 @@ export function TrackHeader({ activeRelease, onReleaseChange }: TrackHeaderProps
 
 function NesoWordmark() {
   return (
-    <div className="hidden shrink-0 items-center gap-2 sm:flex" aria-label="NESO — National Energy System Operator">
-      <div className="flex flex-col leading-none">
-        <span className="text-xl font-extrabold tracking-tight text-primary">NESO</span>
-        <span className="text-[0.5rem] font-medium uppercase tracking-[0.08em] text-muted-foreground">
-          National Energy
-          <br />
-          System Operator
-        </span>
-      </div>
-      <span
+    <div
+      className="hidden h-12 shrink-0 items-center gap-2.5 rounded-sm bg-[#4b003b] px-3.5 text-white shadow-sm sm:flex"
+      aria-label="NESO — National Energy System Operator"
+    >
+      <span className="text-[1.7rem] font-bold leading-none">NESO</span>
+      <svg
         aria-hidden="true"
-        className="block h-7 w-10 rounded-[3px] bg-primary"
-        style={{
-          backgroundImage:
-            "linear-gradient(135deg, transparent 42%, var(--accent) 42%, var(--accent) 58%, transparent 58%), linear-gradient(45deg, transparent 42%, oklch(0.98 0.008 240) 42%, oklch(0.98 0.008 240) 58%, transparent 58%)",
-        }}
-      />
+        viewBox="0 0 54 42"
+        className="h-9 w-[46px] shrink-0"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M7 2V40" stroke="currentColor" strokeWidth="3.2" />
+        <path d="M8 21L47 3" stroke="currentColor" strokeWidth="3.2" />
+        <path d="M8 21L52 11" stroke="currentColor" strokeWidth="3.2" />
+        <path d="M8 21H53" stroke="currentColor" strokeWidth="3.2" />
+        <path d="M8 21L52 31" stroke="currentColor" strokeWidth="3.2" />
+        <path d="M8 21L47 39" stroke="currentColor" strokeWidth="3.2" />
+      </svg>
     </div>
   )
 }

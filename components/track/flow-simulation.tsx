@@ -317,9 +317,12 @@ export function FlowSimulation({
     const cap: number[] = STAGES.map((_, i) =>
       Math.max(2, Math.round((i === bottleneckIndex ? 42 : 9) * visualScale)),
     )
-    const SPEED = 118
-    const LOOP_SPEED = 90
-    const EXIT_SPEED = 70
+    const MOTION_SPEED_SCALE = 0.45
+    const EVENT_INTERVAL_SCALE = 1.75
+    const MAX_MOVING_TOKENS = 5
+    const SPEED = 118 * MOTION_SPEED_SCALE
+    const LOOP_SPEED = 90 * MOTION_SPEED_SCALE
+    const EXIT_SPEED = 70 * MOTION_SPEED_SCALE
     const MAX = Math.round(150 * visualScale)
     const loopProb = 0.22
 
@@ -337,7 +340,7 @@ export function FlowSimulation({
     const effSpawn = () => {
       if (visualScale === 0) return Number.POSITIVE_INFINITY
       const mix = stateRef.current!.scenarioMix
-      return (spawnForMonth(monthRef.current) * (1 - mix) + 340 * mix) / visualScale
+      return ((spawnForMonth(monthRef.current) * (1 - mix) + 340 * mix) / visualScale) * EVENT_INTERVAL_SCALE
     }
 
     const intervalOf = (i: number, p: number[]) =>
@@ -583,6 +586,7 @@ export function FlowSimulation({
 
     // --- Continuous eases (run whether playing or paused) -------------
     const gate = new Array(N).fill(0)
+    let releaseCursor = 0
     function ease(dt: number) {
       const k = Math.min(1, dt / 300)
       // Scenario mix glides toward target.
@@ -615,8 +619,11 @@ export function FlowSimulation({
         state.entered += 1
       }
 
-      for (let i = 0; i < N; i++) {
-        gate[i] += dt
+      for (let i = 0; i < N; i++) gate[i] += dt
+
+      const releaseStart = releaseCursor
+      for (let offset = 0; offset < N && state.moving.length < MAX_MOVING_TOKENS; offset++) {
+        const i = (releaseStart + offset) % N
         if (gate[i] < intervalOf(i, p) || state.queues[i].length === 0) continue
 
         // Fallout: chance a case exits the system here.
@@ -632,6 +639,7 @@ export function FlowSimulation({
             tk.tt = 0
             state.exiting.push(tk)
             state.lost += 1
+            releaseCursor = (i + 1) % N
             continue
           }
         }
@@ -651,6 +659,7 @@ export function FlowSimulation({
         } else {
           gate[i] -= intervalOf(i, p)
           state.queues[i].shift()
+          releaseCursor = (i + 1) % N
           continue
         }
 
@@ -666,6 +675,7 @@ export function FlowSimulation({
         tk.targetPressure = p[target]
         tk.loopLabel = doLoop && loop ? loop.label : undefined
         state.moving.push(tk)
+        releaseCursor = (i + 1) % N
 
         if (doLoop && loop) state.liveLoop[loop.label] = (state.liveLoop[loop.label] ?? 0) + 1
       }

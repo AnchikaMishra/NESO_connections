@@ -1,0 +1,11 @@
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/track/flow-simulation.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pnpm-lock.yaml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pnpm-workspace.yaml', LF will be replaced by CRLF the next time Git touches it
+ .gitignore                           |  9 [32m++++++++[m[31m-[m
+ components/track/flow-simulation.tsx | 22 [32m++++++++++++++++[m[31m------[m
+ package.json                         |  6 [32m+[m[31m-----[m
+ pnpm-lock.yaml                       |  3 [32m+++[m
+ pnpm-workspace.yaml                  |  3 [32m+++[m
+ 5 files changed, 31 insertions(+), 12 deletions(-)
