@@ -196,7 +196,7 @@ function StageMetric({
 }
 
 function buildReasonBreakdown(stageId: string | null, portfolioCount: number, applications: Application[]) {
-  if (stageId === "confirm-design") {
+  if (stageId === "to-design") {
     const scale = portfolioCount / 48
     return [
       ["Awaiting applicant information", 14],

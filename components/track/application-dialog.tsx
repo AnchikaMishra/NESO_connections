@@ -242,9 +242,9 @@ export function ApplicationDialog({ application, open, onOpenChange, onBack }: A
 
 function buildCurrentHistory(app: Application, index: number) {
   const events = [
-    { label: "Application submitted", detail: "Application entered the recorded Connections journey." },
+    { label: "Application received", detail: "Application entered the recorded Connections journey." },
   ]
-  if (index > 0) events.push({ label: "Application validated", detail: "Initial application validation is recorded as complete." })
+  if (index > 0) events.push({ label: "Gate 2 Readiness Checks", detail: "Initial and detailed readiness checks are recorded in the journey." })
   if (app.status === "returned") events.push({ label: "Returned for information", detail: "The current record contains a return or clarification cycle." })
   if (app.blockers.some((blocker) => /rework|re-study/i.test(`${blocker.label} ${blocker.detail}`))) {
     events.push({ label: "Rework recorded", detail: "A current rework or re-study route is recorded on the application." })

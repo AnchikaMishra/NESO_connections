@@ -92,10 +92,10 @@ export const WINDOW_OPTIONS: Array<{ value: WindowAssumption; label: string }> =
 ]
 
 export const CAPACITY_STAGE_OPTIONS = [
-  { value: "confirm-design", label: "Confirm connection design" },
-  { value: "system-studies", label: "System studies" },
-  { value: "gate2-readiness", label: "Gate 2 readiness" },
-  { value: "offer-issued", label: "Offers" },
+  { value: "gate2-readiness", label: "Gate 2 Readiness Checks" },
+  { value: "system-design", label: "System Design" },
+  { value: "to-design", label: "TO Design" },
+  { value: "offer-issued", label: "Issue Offers" },
 ] as const
 
 export const DEFAULT_SYSTEM_SCENARIO_ASSUMPTIONS: SystemScenarioAssumptions = {
@@ -107,23 +107,22 @@ export const DEFAULT_SYSTEM_SCENARIO_ASSUMPTIONS: SystemScenarioAssumptions = {
   applicationWindow: "high-demand",
 }
 
-const BASELINE_COUNTS = [152, 132, 99, 87, 78, 64, 68, 53, 54, 49, 40, 54, 26, 17, 13]
-const BASELINE_DWELL = [14, 12, 19, 14, 24, 31, 44, 30, 35, 34, 28, 42, 36, 25, 8]
+const BASELINE_COUNTS = [154, 139, 113, 103, 101, 89, 91, 76, 45, 41, 36]
+const BASELINE_DWELL = [14, 21, 19, 14, 18, 35, 44, 42, 24, 30, 8]
 const BASELINE_PRESSURES: Record<string, number> = {
-  "planning-consent": 0.55,
-  "confirm-design": 0.82,
-  "to-design": 0.58,
-  "system-studies": 0.72,
+  "strategic-alignment": 0.55,
   "gate2-readiness": 0.78,
+  "system-design": 0.72,
+  "to-design": 0.82,
   "offer-issued": 0.96,
 }
-const BOTTLENECK_CANDIDATES = new Set(["confirm-design", "system-studies", "gate2-readiness", "offer-issued"])
-const REVIEW_STAGES = new Set(["confirm-design", "system-studies", "gate2-readiness", "offer-issued"])
-const REWORK_STAGES = new Set(["confirm-design", "to-design", "system-studies", "gate2-readiness"])
+const BOTTLENECK_CANDIDATES = new Set(["gate2-readiness", "system-design", "to-design", "offer-issued"])
+const REVIEW_STAGES = new Set(["gate2-readiness", "strategic-alignment", "system-design", "to-design", "offer-issued"])
+const REWORK_STAGES = new Set(["gate2-readiness", "system-design", "to-design", "offer-issued"])
 const WINDOW_EFFECTS: Record<string, number> = {
-  "system-studies": 3,
   "gate2-readiness": 7,
-  "gate2-assessment": 6,
+  "strategic-alignment": 6,
+  "system-design": 3,
   "offer-issued": 10,
 }
 
@@ -189,7 +188,7 @@ export function buildSystemScenario(assumptions: SystemScenarioAssumptions): Sys
           ? 0.13
           : stage.id === "offer-issued"
             ? 0.1
-            : stage.id === "system-studies"
+            : stage.id === "system-design"
               ? 0.06
               : 0
         : 0
@@ -332,7 +331,7 @@ function buildDrivers(
   if (assumptions.reviewTurnaround === "faster") {
     drivers.push({
       label: "Review turnaround",
-      detail: "Faster internal review reduces dwell across design, studies, readiness and Offers.",
+      detail: "Faster internal review reduces dwell across readiness, system design, TO design and Offers.",
     })
   }
   if (assumptions.reworkRate === "lower") {

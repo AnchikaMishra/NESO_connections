@@ -32,7 +32,7 @@ export function FlowDiagnostics({ diagnostics, focusId, onFocus, onInvestigate, 
       caption: d?.growing?.label ?? "No queue currently growing",
     },
     {
-      id: mode === "complex" ? "planning-consent" : d?.rework.stageId ?? null,
+      id: mode === "complex" ? "gated-outcome" : d?.rework.stageId ?? null,
       icon: mode === "complex" ? LogOut : RotateCcw,
       tone: "slate" as const,
       label: mode === "complex" ? "Falling out now" : "Returns / rework",

@@ -157,19 +157,19 @@ export function cohortScenarioInsights(window: WindowAssumption): CohortScenario
       {
         cohort: "Data centres",
         pressure: "High",
-        stage: "Offers",
+        stage: "Issue Offers",
         detail: "Concentrated demand arrivals increase offer-production pressure.",
       },
       {
         cohort: "BESS",
         pressure: "Medium",
-        stage: "Gate 2 readiness",
+        stage: "Gate 2 Readiness Checks",
         detail: "Readiness evidence creates moderate repeat-review demand.",
       },
       {
         cohort: "Solar",
         pressure: "Low",
-        stage: "Gate 1 assessment",
+        stage: "Strategic Alignment Assessment",
         detail: "Limited change in the selected future window.",
       },
     ]
@@ -178,19 +178,19 @@ export function cohortScenarioInsights(window: WindowAssumption): CohortScenario
     {
       cohort: "Data centres",
       pressure: "Medium",
-      stage: "Offers",
+      stage: "Issue Offers",
       detail: "Demand remains within the illustrative baseline range.",
     },
     {
       cohort: "BESS",
       pressure: "Medium",
-      stage: "Gate 2 readiness",
+      stage: "Gate 2 Readiness Checks",
       detail: "Evidence completeness remains the main shared sensitivity.",
     },
     {
       cohort: "Solar",
       pressure: "Low",
-      stage: "Gate 1 assessment",
+      stage: "Strategic Alignment Assessment",
       detail: "No material scenario departure is indicated.",
     },
   ]
@@ -297,7 +297,7 @@ function readinessForScenario(risk: ApplicationRisk, score: number): "Low" | "Mo
 function currentTrajectoryFor(application: Application, failureStage: string, cycles: number): string[] {
   const currentStage = stageLabel(application.stageId)
   if (application.id === "meridian-data-campus") {
-    return [currentStage, "Clarification", "Design rework", "Gate 2 readiness"]
+    return [currentStage, "Clarification", "Design rework", "Issue Offers"]
   }
   if (cycles > 0) return [currentStage, "Clarification", failureStage]
   return [currentStage, failureStage]
@@ -310,8 +310,8 @@ function scenarioTrajectoryFor(application: Application, score: number, cycles: 
   const followingStage = STAGES[Math.min(STAGES.length - 1, currentIndex + 2)]?.label ?? nextStage
   if (application.id === "meridian-data-campus" && score >= 3) {
     return score >= 8
-      ? [currentStage, "Gate 2 readiness", "Gate 2 assessment"]
-      : [currentStage, "Focused clarification", "Gate 2 readiness", "Gate 2 assessment"]
+      ? [currentStage, "Issue Offers", "Securities Received"]
+      : [currentStage, "Focused clarification", "Issue Offers", "Securities Received"]
   }
   if (cycles > 0) return [currentStage, "Clarification", nextStage]
   return score >= 3 ? [currentStage, nextStage, followingStage] : [currentStage, nextStage]

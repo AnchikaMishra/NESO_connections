@@ -49,6 +49,21 @@ export type FocusLens = "all" | "blocked" | "long-dwell" | "returned-rework" | "
 export type DwellBand = "Within target" | "1-30 days over" | "30+ days over"
 export type YesNo = "Yes" | "No"
 
+export const APPLICATION_TEAMS = [
+  "Connections Applications Team (CAT)",
+  "Readiness checking team",
+  "Connection Contract Managers (CCMs)",
+  "Customer",
+  "Comms",
+  "Business Intelligence (BI) and Reporting Team",
+  "Finance Fees & Securities (FF&S) & Charging Team",
+  "COAT team",
+  "System planning",
+  "TO design team",
+] as const
+
+export type ApplicationTeam = (typeof APPLICATION_TEAMS)[number]
+
 export const STATUS_META: Record<AppStatus, { label: string; tone: Tone }> = {
   flowing: { label: "Flowing", tone: "success" },
   queued: { label: "Queued", tone: "accent" },
@@ -63,7 +78,7 @@ export interface Blocker {
   label: string
   detail: string
   /** Owner responsible for clearing it. */
-  owner: string
+  owner: ApplicationTeam
 }
 
 export interface Intervention {
@@ -87,6 +102,7 @@ export interface Application {
   cohort: ApplicationCohort
   customerType: CustomerType
   importance: Importance
+  owner: ApplicationTeam
   stageId: string
   status: AppStatus
   daysInStage: number
@@ -111,21 +127,22 @@ export const APPLICATIONS: Application[] = [
     cohort: "Transition cohort",
     customerType: "Direct connect",
     importance: "High",
-    stageId: "confirm-design",
+    owner: "TO design team",
+    stageId: "to-design",
     status: "stuck",
     daysInStage: 74,
     targetDays: 30,
-    summary: "Currently blocked at design confirmation with two clarification loops and an outstanding reinforcement study.",
+    summary: "Currently blocked in TO design with two clarification loops and an outstanding reinforcement study.",
     blockers: [
       {
-        label: "Awaiting connection design confirmation",
+        label: "Awaiting TO design confirmation",
         detail: "Design option B requires a network reinforcement study that has not been scheduled.",
-        owner: "TO design team",
+        owner: "COAT team",
       },
       {
         label: "Two open clarification loops",
         detail: "Load profile and metering assumptions returned to the customer twice for information.",
-        owner: "Customer + Connections",
+        owner: "Connection Contract Managers (CCMs)",
       },
       {
         label: "High system impact",
@@ -152,16 +169,17 @@ export const APPLICATIONS: Application[] = [
     cohort: "New applications",
     customerType: "Developer",
     importance: "Medium",
-    stageId: "confirm-design",
+    owner: "TO design team",
+    stageId: "to-design",
     status: "queued",
     daysInStage: 21,
     targetDays: 30,
-    summary: "Currently waiting for a standard-design reviewer at the design-confirmation bottleneck.",
+    summary: "Currently waiting for a standard-design reviewer at the TO design bottleneck.",
     blockers: [
       {
         label: "Standard design pending queue",
         detail: "Uses a standard design template — only needs a reviewer assigned.",
-        owner: "Connections",
+        owner: "Connections Applications Team (CAT)",
       },
     ],
     interventions: [
@@ -182,11 +200,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "Legacy queue",
     customerType: "Developer",
     importance: "High",
-    stageId: "confirm-design",
+    owner: "Connection Contract Managers (CCMs)",
+    stageId: "to-design",
     status: "at-risk",
     daysInStage: 58,
     targetDays: 30,
-    summary: "A current planning condition expires in six weeks while the application remains in design confirmation.",
+    summary: "A current planning condition expires in six weeks while the application remains in TO design.",
     blockers: [
       {
         label: "Planning condition expiry",
@@ -196,7 +215,7 @@ export const APPLICATIONS: Application[] = [
       {
         label: "Reinforcement dependency",
         detail: "Shares a reinforcement study with Meridian Data Campus.",
-        owner: "TO design team",
+        owner: "COAT team",
       },
     ],
     interventions: [
@@ -217,11 +236,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "Legacy queue",
     customerType: "Direct connect",
     importance: "High",
-    stageId: "system-studies",
+    owner: "System planning",
+    stageId: "system-design",
     status: "stuck",
     daysInStage: 66,
     targetDays: 45,
-    summary: "Complex system studies are extending well beyond target with a re-study loop open.",
+    summary: "Complex system design studies are extending beyond target with a re-study loop open.",
     blockers: [
       {
         label: "Re-study triggered",
@@ -247,11 +267,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "Transition cohort",
     customerType: "Developer",
     importance: "Medium",
+    owner: "Readiness checking team",
     stageId: "gate2-readiness",
     status: "returned",
     daysInStage: 33,
     targetDays: 21,
-    summary: "Returned from the Gate 2 readiness check for missing evidence.",
+    summary: "Returned from Gate 2 Readiness Checks for missing evidence.",
     blockers: [
       {
         label: "Incomplete readiness evidence",
@@ -277,11 +298,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "New applications",
     customerType: "IDNO",
     importance: "Medium",
-    stageId: "planning-consent",
+    owner: "Connection Contract Managers (CCMs)",
+    stageId: "milestone-management",
     status: "flowing",
     daysInStage: 40,
     targetDays: 90,
-    summary: "Progressing on track through planning — no action required.",
+    summary: "Progressing on track through milestone management with no current blocker.",
     blockers: [],
     interventions: [{ label: "Continue monitoring", effect: "No intervention needed; on track for its window.", primary: true }],
   },
@@ -298,11 +320,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "New applications",
     customerType: "Community",
     importance: "Low",
-    stageId: "gate1-assessment",
+    owner: "Readiness checking team",
+    stageId: "gate2-readiness",
     status: "returned",
     daysInStage: 18,
     targetDays: 14,
-    summary: "Returned for information during Gate 1 assessment.",
+    summary: "Returned for information during Gate 2 Readiness Checks.",
     blockers: [
       {
         label: "Clarification on hybrid metering",
@@ -327,11 +350,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "Transition cohort",
     customerType: "Developer",
     importance: "High",
-    stageId: "gate2-assessment",
+    owner: "Connections Applications Team (CAT)",
+    stageId: "gate2",
     status: "flowing",
     daysInStage: 12,
     targetDays: 30,
-    summary: "Strategic project moving well through Gate 2 assessment.",
+    summary: "Strategic project progressing through the Gate 2 outcome.",
     blockers: [],
     interventions: [{ label: "Continue monitoring", effect: "On track; flag if fault-level studies slip.", primary: true }],
   },
@@ -348,11 +372,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "Legacy queue",
     customerType: "Developer",
     importance: "Low",
-    stageId: "land-rights",
+    owner: "Customer",
+    stageId: "gate2-readiness",
     status: "at-risk",
     daysInStage: 96,
     targetDays: 60,
-    summary: "Land negotiations are above the current stage target and a third-party easement remains unresolved.",
+    summary: "Readiness checks remain open because a third-party easement is unresolved.",
     blockers: [
       {
         label: "Stalled land negotiation",
@@ -377,6 +402,7 @@ export const APPLICATIONS: Application[] = [
     cohort: "Transition cohort",
     customerType: "Developer",
     importance: "Medium",
+    owner: "TO design team",
     stageId: "to-design",
     status: "queued",
     daysInStage: 15,
@@ -406,11 +432,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "New applications",
     customerType: "Developer",
     importance: "Low",
-    stageId: "gate1-offer",
+    owner: "Connections Applications Team (CAT)",
+    stageId: "gated-outcome",
     status: "flowing",
     daysInStage: 8,
     targetDays: 21,
-    summary: "Gate 1 offer progressing normally.",
+    summary: "Gate 1 outcome recorded and progressing toward offer preparation.",
     blockers: [],
     interventions: [{ label: "Continue monitoring", effect: "No action needed.", primary: true }],
   },
@@ -427,11 +454,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "Legacy queue",
     customerType: "Direct connect",
     importance: "High",
+    owner: "Finance Fees & Securities (FF&S) & Charging Team",
     stageId: "offer-issued",
     status: "flowing",
     daysInStage: 5,
     targetDays: 30,
-    summary: "Offer issued and awaiting customer acceptance.",
+    summary: "Offer issued and awaiting customer acceptance and securities.",
     blockers: [],
     interventions: [{ label: "Continue monitoring", effect: "On track for acceptance.", primary: true }],
   },
@@ -448,11 +476,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "Legacy queue",
     customerType: "Developer",
     importance: "Medium",
-    stageId: "land-rights",
+    owner: "Connection Contract Managers (CCMs)",
+    stageId: "gate2-readiness",
     status: "withdrawn",
     daysInStage: 112,
     targetDays: 60,
-    summary: "Withdrawal is recorded after the land-rights route could not be completed.",
+    summary: "Withdrawal is recorded after readiness evidence could not be completed.",
     blockers: [],
     interventions: [{ label: "Open case record", effect: "Review the recorded withdrawal information." }],
   },
@@ -469,11 +498,12 @@ export const APPLICATIONS: Application[] = [
     cohort: "Transition cohort",
     customerType: "Developer",
     importance: "Medium",
-    stageId: "gate2-assessment",
+    owner: "Readiness checking team",
+    stageId: "gated-outcome",
     status: "rejected",
     daysInStage: 41,
     targetDays: 30,
-    summary: "Rejection is recorded following the current Gate 2 evidence assessment.",
+    summary: "Rejection is recorded following readiness and strategic alignment assessment.",
     blockers: [],
     interventions: [{ label: "Open case record", effect: "Review the recorded assessment decision." }],
   },
@@ -523,7 +553,7 @@ export const APPLICATION_FILTER_OPTIONS = {
   customerType: unique(APPLICATIONS.map((app) => app.customerType)),
   status: ["stuck", "at-risk", "returned", "queued", "flowing"] as AppStatus[],
   currentStage: STAGES.map((stage) => ({ value: stage.id, label: stage.label })),
-  owningTeam: unique(APPLICATIONS.flatMap((app) => app.blockers.map((blocker) => blocker.owner)).concat("Connections")),
+  owningTeam: [...APPLICATION_TEAMS],
   dwellBand: ["Within target", "1-30 days over", "30+ days over"] as DwellBand[],
   yesNo: ["Yes", "No"] as YesNo[],
 }
@@ -540,10 +570,7 @@ export function applicationMatchesFilters(app: Application, filters: Application
     (filters.customerType === "All" || app.customerType === filters.customerType) &&
     (filters.status === "All" || app.status === filters.status) &&
     (filters.currentStage === "All" || app.stageId === filters.currentStage) &&
-    (filters.owningTeam === "All" ||
-      (filters.owningTeam === "Connections"
-        ? app.blockers.length === 0
-        : app.blockers.some((blocker) => blocker.owner === filters.owningTeam))) &&
+    (filters.owningTeam === "All" || app.owner === filters.owningTeam) &&
     (filters.dwellBand === "All" || dwellBandFor(app) === filters.dwellBand) &&
     (filters.returnedRework === "All" || (isReturnedOrRework(app) ? "Yes" : "No") === filters.returnedRework) &&
     (filters.hasBlocker === "All" || (app.blockers.length > 0 ? "Yes" : "No") === filters.hasBlocker)
@@ -560,7 +587,7 @@ export function isReturnedOrRework(app: Application): boolean {
 }
 
 export function applicationOwner(app: Application): string {
-  return app.blockers[0]?.owner ?? "Connections"
+  return app.owner
 }
 
 export function dwellBandFor(app: Application): DwellBand {

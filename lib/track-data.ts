@@ -21,7 +21,7 @@ export const TIMEFRAMES: { id: Timeframe; label: string }[] = [
   { id: "today", label: "Today" },
   { id: "month1", label: "+1 month" },
   { id: "month6", label: "+6 months" },
-  { id: "afterActions", label: "With CCM actions" },
+  { id: "afterActions", label: "With operational changes" },
 ]
 
 /** The first three timeframes form a "do nothing" forecast; the last is a scenario. */
@@ -34,7 +34,7 @@ export const TIMEFRAME_CAPTION: Record<Timeframe, string> = {
   month1: "Projected in 1 month if nothing changes.",
   month6: "Projected in 6 months if nothing changes — the bottleneck grows.",
   afterActions:
-    "Projected 6-month outcome if the recommended CCM actions are taken now — the counterfactual to “+6 months”.",
+    "Illustrative 6-month outcome with targeted operational changes across accountable teams.",
 }
 
 export type StageKind = "normal" | "bottleneck" | "energised"
@@ -47,30 +47,26 @@ export interface Stage {
   kind: StageKind
 }
 
-/** Process order top-to-bottom of the funnel (15 stages). */
+/** Primary Gate 2 journey agreed with the embedded Connections team. */
 export const STAGES: Stage[] = [
-  { id: "app-submitted", label: "Application submitted", kind: "normal", counts: { today: 126, month1: 134, month6: 152, afterActions: 138 } },
-  { id: "app-validated", label: "Application validated", kind: "normal", counts: { today: 118, month1: 122, month6: 130, afterActions: 128 } },
-  { id: "gate1-assessment", label: "Gate 1 assessment", kind: "normal", counts: { today: 106, month1: 104, month6: 98, afterActions: 112 } },
-  { id: "gate1-offer", label: "Gate 1 offer issued", kind: "normal", counts: { today: 92, month1: 90, month6: 84, afterActions: 98 } },
-  { id: "land-rights", label: "Secure land rights", kind: "normal", counts: { today: 85, month1: 82, month6: 76, afterActions: 88 } },
-  { id: "planning-consent", label: "Obtain planning consent", kind: "normal", counts: { today: 70, month1: 68, month6: 62, afterActions: 74 } },
-  { id: "confirm-design", label: "Confirm connection design", kind: "bottleneck", counts: { today: 48, month1: 55, month6: 68, afterActions: 22 } },
-  { id: "to-design", label: "TO design & options", kind: "normal", counts: { today: 44, month1: 46, month6: 44, afterActions: 52 } },
-  { id: "system-studies", label: "System studies", kind: "normal", counts: { today: 41, month1: 40, month6: 38, afterActions: 47 } },
-  { id: "gate2-readiness", label: "Gate 2 readiness check", kind: "normal", counts: { today: 38, month1: 37, month6: 34, afterActions: 44 } },
-  { id: "gate2-assessment", label: "Gate 2 assessment", kind: "normal", counts: { today: 31, month1: 30, month6: 28, afterActions: 38 } },
-  { id: "offer-issued", label: "Offer issued", kind: "normal", counts: { today: 28, month1: 29, month6: 27, afterActions: 35 } },
-  { id: "delivery", label: "Delivery / construction", kind: "normal", counts: { today: 21, month1: 22, month6: 24, afterActions: 28 } },
-  { id: "commissioning", label: "Commissioning", kind: "normal", counts: { today: 14, month1: 15, month6: 17, afterActions: 20 } },
-  { id: "energised", label: "Energised", kind: "energised", counts: { today: 10, month1: 11, month6: 13, afterActions: 18 } },
+  { id: "application-received", label: "Application received", kind: "normal", counts: { today: 128, month1: 136, month6: 154, afterActions: 140 } },
+  { id: "gate2-readiness", label: "Gate 2 Readiness Checks", kind: "normal", counts: { today: 126, month1: 130, month6: 138, afterActions: 132 } },
+  { id: "strategic-alignment", label: "Strategic Alignment Assessment", kind: "normal", counts: { today: 105, month1: 106, month6: 112, afterActions: 110 } },
+  { id: "gated-outcome", label: "Gated Outcome", kind: "normal", counts: { today: 94, month1: 96, month6: 101, afterActions: 100 } },
+  { id: "gate2", label: "Gate 2", kind: "normal", counts: { today: 93, month1: 95, month6: 99, afterActions: 98 } },
+  { id: "system-design", label: "System Design", kind: "normal", counts: { today: 77, month1: 81, month6: 88, afterActions: 84 } },
+  { id: "to-design", label: "TO Design", kind: "bottleneck", counts: { today: 70, month1: 77, month6: 91, afterActions: 38 } },
+  { id: "offer-issued", label: "Issue Offers", kind: "normal", counts: { today: 42, month1: 55, month6: 76, afterActions: 49 } },
+  { id: "securities-received", label: "Securities Received", kind: "normal", counts: { today: 39, month1: 40, month6: 45, afterActions: 46 } },
+  { id: "milestone-management", label: "Milestone Management", kind: "normal", counts: { today: 36, month1: 37, month6: 40, afterActions: 42 } },
+  { id: "connected", label: "Connected", kind: "energised", counts: { today: 30, month1: 32, month6: 36, afterActions: 40 } },
 ]
 
-/** Layout rows mirror the mock-up: 6 / 5 / 4 cards, all left-aligned. */
+/** Compact rows preserve the established marble-run layout. */
 export const STAGE_ROWS: Stage[][] = [
-  STAGES.slice(0, 6),
-  STAGES.slice(6, 11),
-  STAGES.slice(11, 15),
+  STAGES.slice(0, 4),
+  STAGES.slice(4, 8),
+  STAGES.slice(8, 11),
 ]
 
 /* ------------------------------------------------------------------ *
@@ -91,15 +87,13 @@ export interface ClarificationLoop {
 }
 
 export const CLARIFICATION_LOOPS: ClarificationLoop[] = [
-  // Row 0 — Gate 1 assessment sends cases back for more information.
-  { id: "gate1-clar", row: 0, fromCol: 2, toCol: 1, label: "Returned for info" },
-  { id: "gate1-resubmit", row: 0, fromCol: 3, toCol: 1, label: "Resubmission" },
-  { id: "consent-return", row: 0, fromCol: 5, toCol: 4, label: "Consent return" },
-  // Row 1 — Gate 2 readiness bounces cases back into the design bottleneck.
-  { id: "gate2-rework", row: 1, fromCol: 3, toCol: 0, label: "Design rework" },
-  // Row 1 — System studies trigger a re-study loop to TO design.
-  { id: "studies-clar", row: 1, fromCol: 2, toCol: 1, label: "Re-study" },
-  { id: "gate2-not-ready", row: 1, fromCol: 4, toCol: 3, label: "Not ready" },
+  // Readiness and strategic-alignment checks can return applications for more information.
+  { id: "readiness-resubmit", row: 0, fromCol: 1, toCol: 0, label: "Readiness resubmission" },
+  { id: "alignment-return", row: 0, fromCol: 2, toCol: 1, label: "Returned for checks" },
+  { id: "gated-return", row: 0, fromCol: 3, toCol: 1, label: "Gate 1 / resubmission" },
+  // System and TO design can loop when technical assumptions change.
+  { id: "design-rework", row: 1, fromCol: 2, toCol: 1, label: "Design rework" },
+  { id: "offer-clarification", row: 1, fromCol: 3, toCol: 2, label: "Offer clarification" },
 ]
 
 /** Baseline congestion by timeframe — grows toward +6 months, cools after action. */
@@ -111,7 +105,7 @@ const TIMEFRAME_PRESSURE: Record<Timeframe, number> = {
 }
 
 /** Stages that sit in or feed the bottleneck carry extra pressure. */
-const HIGH_PRESSURE_STAGES = new Set(["planning-consent", "to-design", "system-studies", "gate2-readiness"])
+const HIGH_PRESSURE_STAGES = new Set(["gate2-readiness", "system-design", "offer-issued"])
 
 /**
  * Congestion for a stage at a given timeframe, 0 (free-flowing, orange) → 1
@@ -179,9 +173,9 @@ export interface ExitPoint {
 }
 
 export const EXIT_POINTS: ExitPoint[] = [
-  { stageId: "land-rights", kind: "withdrawn", baseRate: 0.03 },
-  { stageId: "planning-consent", kind: "rejected", baseRate: 0.05 },
-  { stageId: "gate2-assessment", kind: "rejected", baseRate: 0.04 },
+  { stageId: "gated-outcome", kind: "rejected", baseRate: 0.04 },
+  { stageId: "offer-issued", kind: "withdrawn", baseRate: 0.03 },
+  { stageId: "milestone-management", kind: "withdrawn", baseRate: 0.02 },
 ]
 
 /* ------------------------------------------------------------------ *
@@ -213,7 +207,7 @@ export const KPIS: Kpi[] = [
     label: "Active applications",
     icon: Users,
     tone: "accent",
-    values: { today: 126, month1: 134, month6: 152, afterActions: 138 },
+    values: { today: 128, month1: 136, month6: 154, afterActions: 140 },
     info: "Total live connection applications currently in the journey.",
   },
   {
@@ -221,7 +215,7 @@ export const KPIS: Kpi[] = [
     label: "Current bottleneck queue",
     icon: TriangleAlert,
     tone: "warning",
-    values: { today: 48, month1: 55, month6: 68, afterActions: 22 },
+    values: { today: 70, month1: 77, month6: 91, afterActions: 38 },
     info: "Applications currently represented at the most constrained stage.",
   },
   {
@@ -244,7 +238,7 @@ export const KPIS: Kpi[] = [
 
 /* ---- Right-hand insight rail ---------------------------------------- */
 
-export const BOTTLENECK_STAGE_ID = "confirm-design"
+export const BOTTLENECK_STAGE_ID = "to-design"
 
 export const BOTTLENECK_MESSAGE: Record<Timeframe, { text: string; tone: Tone }> = {
   today: { text: "Elevated wait time and cycle risk", tone: "danger" },

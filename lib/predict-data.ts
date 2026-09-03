@@ -60,9 +60,9 @@ export const FORECAST_HORIZONS: Array<{ value: ForecastHorizon; label: string; d
 ]
 
 const FORECAST_COUNTS: Record<ForecastHorizon, number[]> = {
-  30: [134, 122, 104, 90, 82, 68, 55, 46, 43, 40, 34, 36, 22, 15, 11],
-  60: [143, 127, 102, 89, 80, 66, 61, 49, 48, 44, 37, 44, 24, 16, 12],
-  90: [152, 132, 99, 87, 78, 64, 68, 53, 54, 49, 40, 53, 26, 17, 13],
+  30: [136, 130, 106, 96, 95, 81, 77, 55, 40, 37, 32],
+  60: [145, 134, 108, 99, 97, 84, 84, 65, 42, 39, 34],
+  90: [154, 139, 113, 103, 101, 89, 91, 76, 45, 41, 36],
 }
 
 interface StageSignalConfig {
@@ -81,19 +81,19 @@ function rankForecastDrivers(drivers: ForecastDriverSeed[]): ForecastDriver[] {
 }
 
 const STAGE_SIGNALS: Partial<Record<string, StageSignalConfig>> = {
-  "confirm-design": {
+  "to-design": {
     arrivalsPerWeek: 23,
     capacityPerWeek: 16,
     probability: { 30: 96, 60: 97, 90: 98 },
     timeToConstraintDays: 0,
     drivers: [
       {
-        label: "Current design queue",
+        label: "Current TO design queue",
         detail: "Specialist reviews continue to complete more slowly than cases arrive.",
       },
     ],
   },
-  "system-studies": {
+  "system-design": {
     arrivalsPerWeek: 15,
     capacityPerWeek: 12,
     probability: { 30: 58, 60: 76, 90: 89 },
@@ -101,7 +101,7 @@ const STAGE_SIGNALS: Partial<Record<string, StageSignalConfig>> = {
     drivers: [
       {
         label: "Re-study demand",
-        detail: "Re-study demand and reinforcement dependencies consume forecast specialist capacity.",
+        detail: "Re-study demand and reinforcement dependencies consume forecast system-design capacity.",
       },
     ],
   },
@@ -155,11 +155,10 @@ export const FORECAST_RISK_META: Record<ForecastRisk, { label: string; className
 }
 
 export function forecastRiskForStage(stageId: string, horizon: ForecastHorizon): ForecastRisk {
-  if (stageId === "confirm-design") return "constrained"
+  if (stageId === "to-design") return "constrained"
   if (stageId === "offer-issued") return horizon === 30 ? "emerging" : "constrained"
-  if (stageId === "system-studies") return horizon === 30 ? "watch" : horizon === 60 ? "emerging" : "constrained"
+  if (stageId === "system-design") return horizon === 30 ? "watch" : horizon === 60 ? "emerging" : "constrained"
   if (stageId === "gate2-readiness") return horizon === 90 ? "emerging" : "watch"
-  if (stageId === "planning-consent" && horizon === 90) return "watch"
   return "stable"
 }
 
@@ -286,7 +285,7 @@ export function systemForecastInsights(horizon: ForecastHorizon): SystemForecast
   const offer = stageForecastFor("offer-issued", horizon)
   const leadingCohort = cohortForecastsFor(horizon)[0]
   const offerStage = STAGES.find((stage) => stage.id === "offer-issued") ?? STAGES[0]
-  const upstreamStage = STAGES.find((stage) => stage.id === "gate2-assessment") ?? STAGES[0]
+  const upstreamStage = STAGES.find((stage) => stage.id === "to-design") ?? STAGES[0]
 
   return [
     {
@@ -321,7 +320,7 @@ export function systemForecastInsights(horizon: ForecastHorizon): SystemForecast
 }
 
 const GUIDANCE_BY_STAGE: Record<string, GuidanceContext> = {
-  "confirm-design": {
+  "to-design": {
     title: "Connections Design Evidence Guide",
     reference: "Illustrative guidance CON-GD-04",
     version: "v2.1",
@@ -330,12 +329,12 @@ const GUIDANCE_BY_STAGE: Record<string, GuidanceContext> = {
     relevantSection: "Section 4.2 - Design dependency evidence",
     relevantSectionText: "Illustrative context: design dependencies should have a recorded owner, evidence status and expected resolution date before progression.",
   },
-  "system-studies": {
-    title: "Connections System Studies Guide",
+  "system-design": {
+    title: "Connections System Design Guide",
     reference: "Illustrative guidance CON-SS-07",
     version: "v1.4",
     publishedDate: "3 April 2025",
-    topic: "Re-study dependencies and evidence",
+    topic: "System design dependencies and evidence",
     relevantSection: "Section 7.1 - Repeat study controls",
     relevantSectionText: "Illustrative context: repeat studies should record the changed assumption, specialist owner and revised completion milestone.",
   },
@@ -357,50 +356,41 @@ const GUIDANCE_BY_STAGE: Record<string, GuidanceContext> = {
     relevantSection: "Section 3.4 - Offer production dependencies",
     relevantSectionText: "Illustrative context: offer preparation should identify outstanding technical dependencies and the evidence required before assurance.",
   },
-  "land-rights": {
-    title: "Connections Land Evidence Guide",
-    reference: "Illustrative guidance CON-LR-05",
+  "strategic-alignment": {
+    title: "Strategic Alignment Assessment Guide",
+    reference: "Illustrative guidance CON-SA-05",
     version: "v1.3",
     publishedDate: "28 March 2025",
-    topic: "Land-rights evidence and milestones",
-    relevantSection: "Section 5.2 - Third-party land dependencies",
-    relevantSectionText: "Illustrative context: unresolved third-party rights should have a recorded status, accountable owner and milestone date.",
+    topic: "Strategic alignment evidence",
+    relevantSection: "Section 5.2 - Alignment evidence",
+    relevantSectionText: "Illustrative context: strategic alignment should be assessed against the recorded project evidence and current methodology.",
   },
-  "planning-consent": {
-    title: "Connections Planning Evidence Guide",
-    reference: "Illustrative guidance CON-PC-02",
+  "gated-outcome": {
+    title: "Connections Gated Outcome Guide",
+    reference: "Illustrative guidance CON-GO-02",
     version: "v2.0",
     publishedDate: "9 May 2025",
-    topic: "Planning evidence and consent milestones",
-    relevantSection: "Section 2.5 - Consent milestone evidence",
-    relevantSectionText: "Illustrative context: consent milestones should be evidenced against the current application programme and recorded dependencies.",
+    topic: "Gate 1 and Gate 2 outcomes",
+    relevantSection: "Section 2.5 - Gated outcome evidence",
+    relevantSectionText: "Illustrative context: the gated outcome should be supported by the completed readiness and strategic alignment record.",
   },
-  "gate1-assessment": {
-    title: "Gate 1 Information Requirements",
-    reference: "Illustrative guidance CON-G1-01",
+  "securities-received": {
+    title: "Connections Securities Guide",
+    reference: "Illustrative guidance CON-FS-01",
     version: "v1.5",
     publishedDate: "17 April 2025",
-    topic: "Application information completeness",
-    relevantSection: "Section 1.4 - Clarification controls",
-    relevantSectionText: "Illustrative context: clarification requests should identify the incomplete field, evidence owner and expected response date.",
+    topic: "Securities and charging evidence",
+    relevantSection: "Section 1.4 - Securities receipt checks",
+    relevantSectionText: "Illustrative context: securities status and associated charging records should be reconciled before milestone management.",
   },
-  "gate1-offer": {
-    title: "Gate 1 Offer Preparation Guide",
-    reference: "Illustrative guidance CON-G1-03",
+  "milestone-management": {
+    title: "Connections Milestone Management Guide",
+    reference: "Illustrative guidance CON-MM-03",
     version: "v1.1",
     publishedDate: "24 April 2025",
-    topic: "Gate 1 offer preparation",
-    relevantSection: "Section 3.1 - Offer evidence checks",
-    relevantSectionText: "Illustrative context: preparation checks should reconcile application data with the technical assumptions used in the offer.",
-  },
-  delivery: {
-    title: "Connections Delivery Transition Guide",
-    reference: "Illustrative guidance CON-DL-01",
-    version: "v1.8",
-    publishedDate: "6 June 2025",
-    topic: "Delivery transition readiness",
-    relevantSection: "Section 1.6 - Acceptance and handover",
-    relevantSectionText: "Illustrative context: transition should confirm acceptance status, delivery ownership and outstanding handover evidence.",
+    topic: "Post-offer milestone management",
+    relevantSection: "Section 3.1 - Milestone evidence",
+    relevantSectionText: "Illustrative context: milestone status should be supported by current evidence, ownership and expected completion dates.",
   },
 }
 
@@ -420,18 +410,18 @@ interface ApplicationForecastProfile {
 const APPLICATION_FORECAST_PROFILES: ApplicationForecastProfile[] = [
   {
     applicationId: "meridian-data-campus",
-    failureStageId: "confirm-design",
+    failureStageId: "to-design",
     baseRisk: 96,
     daysToThreshold: 0,
     dwellGrowth: 0.82,
     confidence: 88,
     dataCoverage: 94,
     cohortMedianDays: 36,
-    outcome: "The current design-confirmation stall is likely to persist through the forecast window.",
+    outcome: "The current TO design stall is likely to persist through the forecast window.",
     drivers: [
       { label: "Unscheduled reinforcement study", detail: "The primary dependency has no recorded completion date." },
       { label: "Repeated clarification", detail: "Two previous returns increase the likelihood of another incomplete cycle." },
-      { label: "Stage capacity", detail: "Design-confirmation demand is forecast to remain above available throughput." },
+      { label: "Stage capacity", detail: "TO design demand is forecast to remain above available throughput." },
     ],
   },
   {
@@ -451,14 +441,14 @@ const APPLICATION_FORECAST_PROFILES: ApplicationForecastProfile[] = [
   },
   {
     applicationId: "north-fen-wind",
-    failureStageId: "confirm-design",
+    failureStageId: "to-design",
     baseRisk: 91,
     daysToThreshold: 12,
     dwellGrowth: 0.75,
     confidence: 87,
     dataCoverage: 93,
     cohortMedianDays: 38,
-    outcome: "Likely to miss its planning-condition window while design confirmation remains constrained.",
+    outcome: "Likely to miss its planning-condition window while TO design remains constrained.",
     drivers: [
       { label: "Planning condition", detail: "The recorded condition expires before the forecast stage-clearance date." },
       { label: "Reinforcement dependency", detail: "The shared study remains coupled to another delayed application." },
@@ -466,14 +456,14 @@ const APPLICATION_FORECAST_PROFILES: ApplicationForecastProfile[] = [
   },
   {
     applicationId: "eastport-interconnector",
-    failureStageId: "system-studies",
+    failureStageId: "system-design",
     baseRisk: 88,
     daysToThreshold: 9,
     dwellGrowth: 0.7,
     confidence: 85,
     dataCoverage: 89,
     cohortMedianDays: 49,
-    outcome: "The open re-study is likely to keep the application above its system-studies dwell target.",
+    outcome: "The open re-study is likely to keep the application above its system-design dwell target.",
     drivers: [
       { label: "Fault-level re-study", detail: "A repeat study cycle is already recorded and remains incomplete." },
       { label: "Specialist capacity", detail: "Forecast study demand is above available specialist throughput." },
@@ -496,26 +486,26 @@ const APPLICATION_FORECAST_PROFILES: ApplicationForecastProfile[] = [
   },
   {
     applicationId: "harbour-demand",
-    failureStageId: "planning-consent",
+    failureStageId: "milestone-management",
     baseRisk: 28,
     daysToThreshold: null,
     dwellGrowth: 0.18,
     confidence: 79,
     dataCoverage: 88,
     cohortMedianDays: 72,
-    outcome: "Expected to remain within the planning-stage dwell range.",
+    outcome: "Expected to remain within the milestone-management dwell range.",
     drivers: [{ label: "Current progression", detail: "Recorded milestones remain consistent with comparable demand applications." }],
   },
   {
     applicationId: "greenmoor-hybrid",
-    failureStageId: "gate1-assessment",
+    failureStageId: "gate2-readiness",
     baseRisk: 64,
     daysToThreshold: 24,
     dwellGrowth: 0.46,
     confidence: 76,
     dataCoverage: 83,
     cohortMedianDays: 16,
-    outcome: "A further metering clarification could extend the current Gate 1 return cycle.",
+    outcome: "A further metering clarification could extend the current readiness return cycle.",
     drivers: [
       { label: "Hybrid metering ambiguity", detail: "The import and export split remains unresolved." },
       { label: "Limited comparable evidence", detail: "The cohort contains fewer directly comparable hybrid cases." },
@@ -538,14 +528,14 @@ const APPLICATION_FORECAST_PROFILES: ApplicationForecastProfile[] = [
   },
   {
     applicationId: "willow-solar",
-    failureStageId: "land-rights",
+    failureStageId: "gate2-readiness",
     baseRisk: 84,
     daysToThreshold: 8,
     dwellGrowth: 0.68,
     confidence: 86,
     dataCoverage: 90,
     cohortMedianDays: 65,
-    outcome: "The unresolved easement is likely to keep the application above its land-rights target.",
+    outcome: "The unresolved easement is likely to keep the application above its readiness-check target.",
     drivers: [
       { label: "Third-party easement", detail: "No resolution milestone is recorded for the outstanding negotiation." },
       { label: "Current dwell", detail: "Time in stage is already materially above the comparable cohort median." },
@@ -568,26 +558,26 @@ const APPLICATION_FORECAST_PROFILES: ApplicationForecastProfile[] = [
   },
   {
     applicationId: "fenland-solar",
-    failureStageId: "gate1-offer",
+    failureStageId: "gated-outcome",
     baseRisk: 22,
     daysToThreshold: null,
     dwellGrowth: 0.14,
     confidence: 83,
     dataCoverage: 93,
     cohortMedianDays: 19,
-    outcome: "Expected to continue through Gate 1 within the cohort range.",
+    outcome: "Expected to progress from its Gate 1 outcome within the cohort range.",
     drivers: [{ label: "Comparable progression", detail: "Current timing aligns with similar new solar applications." }],
   },
   {
     applicationId: "dockside-demand",
-    failureStageId: "delivery",
+    failureStageId: "securities-received",
     baseRisk: 42,
     daysToThreshold: 38,
     dwellGrowth: 0.25,
     confidence: 77,
     dataCoverage: 86,
     cohortMedianDays: 26,
-    outcome: "Offer acceptance is expected, with moderate uncertainty around the transition into delivery.",
+    outcome: "Offer acceptance is expected, with moderate uncertainty around securities receipt.",
     drivers: [{ label: "Acceptance timing", detail: "The customer acceptance date is not yet recorded." }],
   },
 ]

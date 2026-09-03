@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import {
   CLARIFICATION_LOOPS,
   EXIT_POINTS,
+  STAGE_ROWS,
   STAGES,
   interpPressure,
   interpStageCount,
@@ -38,7 +39,7 @@ interface FlowSimulationProps {
   stageRefs: React.MutableRefObject<(HTMLElement | null)[]>
   /** Continuous forecast position in months (0..6). Ignored when scenario is on. */
   month: number
-  /** When true, ease everything toward the "with CCM actions" scenario. */
+  /** When true, ease everything toward the operational-change scenario. */
   scenario: boolean
   playing: boolean
   mode: FlowMode
@@ -66,10 +67,18 @@ const TEAL = "#3E63C7"
 const SLATE = "#64748B"
 
 const N = STAGES.length
-const rowOf = (i: number) => (i < 6 ? 0 : i < 11 ? 1 : 2)
+const ROW_START = STAGE_ROWS.reduce<number[]>((starts, row, rowIndex) => {
+  const previousStart = starts[rowIndex - 1] ?? 0
+  const previousLength = STAGE_ROWS[rowIndex - 1]?.length ?? 0
+  starts.push(previousStart + previousLength)
+  return starts
+}, [])
+const rowOf = (stageIndex: number) =>
+  STAGE_ROWS.findIndex(
+    (row, rowIndex) => stageIndex >= ROW_START[rowIndex] && stageIndex < ROW_START[rowIndex] + row.length,
+  )
 
 // Loop source -> destination (global stage indices) + label.
-const ROW_START = [0, 6, 11]
 const LOOPS = CLARIFICATION_LOOPS.map((l) => ({
   src: ROW_START[l.row] + l.fromCol,
   dst: ROW_START[l.row] + l.toCol,
@@ -381,7 +390,7 @@ export function FlowSimulation({
         prevQueueLen: queues.map((q) => q.length),
         growthRate: new Array(N).fill(0),
         lost: Math.round(7 * aggregateScale),
-        entered: Math.round(126 * aggregateScale),
+        entered: Math.round(STAGES[0].counts.today * aggregateScale),
         spawnAcc: 0,
         scenarioMix: scenarioRef.current ? 1 : 0,
         nextCaseNumber,
@@ -444,8 +453,8 @@ export function FlowSimulation({
             ? { stageId: STAGES[gi].id, label: STAGES[gi].label, delta: gmax }
             : null,
         rework: {
-          stageId: "confirm-design",
-          label: "Confirm connection design",
+          stageId: "gate2-readiness",
+          label: "Gate 2 Readiness Checks",
           count: Math.round(Object.values(state.liveLoop).reduce((total, count) => total + count, 0) * 0.5),
         },
         fallout: { lost: Math.round(state.lost), rate: state.entered ? state.lost / state.entered : 0 },

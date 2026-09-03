@@ -341,7 +341,7 @@ function StageForecastDialog({
   onOpenApplication: (application: Application) => void
   onViewAffectedApplications: () => void
 }) {
-  const detail = forecastStageDetail(stageId ?? "app-submitted", horizon, filterScale)
+  const detail = forecastStageDetail(stageId ?? "application-received", horizon, filterScale)
   const affected = forecasts
     .filter((forecast) => forecast.failureStageId === stageId)
     .sort((a, b) => b.risk - a.risk)
